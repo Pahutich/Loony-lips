@@ -1,22 +1,41 @@
 extends Control
 
+var player_words = []
+var prompts = ["a name", "a noun", "adverb", "adjective"]
+var story = "Once upon a time someone called %s ate a %s flavoured sandwich which made him feel all %s inside. It was a %s day "
+
+onready var PlayerText = $VBoxContainer/HBoxContainer/PlayerText
+onready var DisplayText = $VBoxContainer/DisplayText
 
 func _ready():
-	var prompts = ["Dima", "Minions", "greatest"]
-	var story = "Once upon a time %s watched %s and thought it was the %s movie of the past two decades"
-	story = story % prompts
+	DisplayText.text = "Welcome to Loony Lips! We are going to tell a story and have a wonderful time! "
+	check_player_words_length()
 	
 #	$VBoxContainer/PlayerText.text = story
 
 func _on_PlayerText_text_entered(new_text):
-	update_DisplayText(new_text)
+	add_to_player_words()
 	
 func _on_TextureButton_pressed():
-	var words = $VBoxContainer/HBoxContainer/PlayerText.text
-	update_DisplayText(words)
+	add_to_player_words()
+
+func add_to_player_words():
+	player_words.append(PlayerText.text)
+	DisplayText.text = ""
+	PlayerText.clear()
+	check_player_words_length()
+
+func is_story_done():
+	return player_words.size() == prompts.size()
 	
-func update_DisplayText(words):
-	$VBoxContainer/DisplayText.text = words
-	$VBoxContainer/HBoxContainer/PlayerText.clear()
-
-
+func check_player_words_length():
+	if is_story_done():
+		tell_story()
+	else:
+		prompt_player()
+		
+func tell_story():
+	DisplayText.text = story % player_words
+	
+func prompt_player():
+	DisplayText.text += "May I have " + prompts[player_words.size()] + " please?"
